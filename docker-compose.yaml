@@ -1,0 +1,61 @@
+services:
+  frontend:
+    container_name: chatbot-frontend
+    build:
+      context: "${FRONTEND_DIR}"
+      dockerfile: "${FRONTEND_DIR}/Dockerfile"
+      tags:
+        - chatbot-frontend
+    volumes:
+      - "${DOCUMENT_DIR}:/app/documents"
+    network_mode: "host"
+    restart: always
+    depends_on:
+      - backend
+  backend:
+    container_name: chatbot-backend
+    build:
+      context: "${BACKEND_DIR}"
+      dockerfile: "${BACKEND_DIR}/Dockerfile"
+      tags:
+        - chatbot-backend
+    ports:
+      - 8084:8084
+    volumes:
+      - "${DOCUMENT_DIR}:/app/documents"
+    network_mode: "host"
+    restart: always
+    depends_on:
+      - vectordb
+      - ollama
+  vectordb:
+    container_name: vectordb
+    image: qdrant/qdrant:v1.13.2-gpu-nvidia
+    ## If not using Nvidia GPU use the following image instead
+    # image: qdrant/qdrant:v1.13.2
+    ports:
+      - 6333:6333
+      - 6334:6334
+    volumes:
+      - "${VECTOR_DB_DIR}:/qdrant/storage"
+    network_mode: "host"
+    restart: always
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:0.5.7
+    ## If not using Nvidia GPU please comment out the following deploy spec
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+    ports:
+      - 11434:11434
+    volumes:
+      - "${OLLAMA_DIR}:/root/.ollama"
+      - "${OLLAMA_DIR}/startup.sh:/root/.ollama/startup.sh"
+    network_mode: "host"
+    entrypoint: ["sh", "/root/.ollama/startup.sh"]

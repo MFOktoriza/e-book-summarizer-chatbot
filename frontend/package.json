@@ -1,0 +1,17 @@
+{
+  "name": "discord",
+  "version": "1.0.0",
+  "description": "discord interface for document summarization chatbot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Muhammad Fikri Oktoriza",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.17.3",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1"
+  }
+}
